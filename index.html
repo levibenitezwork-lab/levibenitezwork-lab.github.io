@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Levi Mello — Compositing Portfolio</title>
+
+<!-- Levi Mello — links page. Vimeo and Instagram links are already filled in. -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0a0c0e;
+    --panel: #14171b;
+    --panel-hover: #191d22;
+    --border: #262b31;
+    --border-hover: #3a4149;
+    --wire: #2c3238;
+    --text: #edeef0;
+    --text-dim: #8b929b;
+    --text-faint: #565d66;
+    --accent: #ff7a3d;
+    --accent-dim: #7a4a30;
+    --teal: #4fd1c5;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ background: var(--bg); }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 64px 20px 40px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* faint node-graph dot grid backdrop */
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.35;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 0%, transparent 75%);
+    pointer-events: none;
+  }
+
+  .page{
+    width: 100%;
+    max-width: 460px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- HERO ---------- */
+
+  .hero{
+    margin-bottom: 56px;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 6px var(--teal);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .tagline{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    color: var(--teal);
+    margin-top: 10px;
+  }
+
+  .role{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--accent);
+    margin-top: 10px;
+  }
+
+  .bio{
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin-top: 16px;
+    max-width: 40ch;
+  }
+
+  .status{
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 20px;
+    max-width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 9px 14px;
+    border-radius: 8px;
+  }
+  .status .dot{
+    flex-shrink: 0;
+    width: 6px; height: 6px;
+    margin-top: 4px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 6px var(--teal);
+  }
+
+  /* ---------- NODE GRAPH ---------- */
+
+  .graph{
+    position: relative;
+    padding-left: 26px;
+  }
+
+  .graph::before{
+    content:"";
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--wire) 8%, var(--wire) 92%, transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    animation: drawWire 1s cubic-bezier(.4,0,.2,1) forwards;
+    animation-delay: 0.15s;
+  }
+
+  @keyframes drawWire{
+    to{ transform: scaleY(1); }
+  }
+
+  .group{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .node{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 16px;
+    text-decoration: none;
+    color: var(--text);
+    opacity: 0;
+    animation: nodeIn 0.5s ease forwards;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  }
+
+  .node:hover, .node:focus-visible{
+    border-color: var(--border-hover);
+    background: var(--panel-hover);
+    transform: translateX(3px);
+    outline: none;
+  }
+
+  .node.primary{
+    padding: 20px 18px;
+    border-color: var(--accent-dim);
+    background: linear-gradient(180deg, #1a1712, var(--panel));
+  }
+  .node.primary:hover, .node.primary:focus-visible{
+    border-color: var(--accent);
+  }
+
+  @keyframes nodeIn{
+    from{ opacity: 0; transform: translateX(-6px); }
+    to{ opacity: 1; transform: translateX(0); }
+  }
+
+  /* stub connecting spine to node + plug dot */
+  .node::before{
+    content:"";
+    position: absolute;
+    left: -26px;
+    top: 50%;
+    width: 20px;
+    height: 1px;
+    background: var(--wire);
+  }
+
+  .plug{
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--wire);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .node:hover .plug, .node:focus-visible .plug{
+    border-color: var(--plug-color, var(--accent));
+    box-shadow: 0 0 8px var(--plug-color, var(--accent));
+  }
+  .node.primary .plug{ border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+
+  .node-icon{
+    flex-shrink: 0;
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .node-icon svg{ width: 18px; height: 18px; }
+
+  .node-body{ flex: 1; min-width: 0; }
+
+  .node-tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .node.primary .node-tag{ color: var(--accent); }
+
+  .node-title{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--text);
+  }
+  .node-sub{
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  .chevron{
+    flex-shrink: 0;
+    color: var(--text-faint);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+  .node:hover .chevron, .node:focus-visible .chevron{
+    transform: translateX(2px);
+    color: var(--text-dim);
+  }
+
+  /* stagger node entrance */
+  .node:nth-child(1){ animation-delay: 0.35s; }
+  .node:nth-child(2){ animation-delay: 0.48s; }
+
+  /* ---------- FOOTER ---------- */
+
+  footer{
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .graph::before, .node, .eyebrow .dot{ animation: none !important; transform:none !important; opacity:1 !important; }
+  }
+
+  @media (max-width: 400px){
+    h1{ font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span>COMPOSITING PORTFOLIO · 2026</div>
+    <h1>Levi Mello</h1>
+    <div class="tagline">Crafting cinematic realities</div>
+    <div class="role">Junior Nuke Compositor · AI &amp; VFX Artist</div>
+    <p class="bio">Combining digital compositing and AI-driven workflows to create polished, cinematic visual experiences.</p>
+    <div class="status"><span class="dot"></span>OPEN TO JUNIOR, CREATIVE &amp; COLLABORATIVE OPPORTUNITIES · SÃO PAULO, BRAZIL</div>
+  </div>
+
+  <div class="graph">
+
+    <div class="group">
+
+      <a class="node primary" style="--plug-color:var(--accent)" href="https://vimeo.com/user261577461" target="_blank" rel="noopener">
+        <span class="plug"></span>
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ff7a3d" stroke-width="1.6"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+        </div>
+        <div class="node-body">
+          <div class="node-tag">Output · Vimeo</div>
+          <div class="node-title">Watch my reel</div>
+          <div class="node-sub">Compositing showreel, breakdowns &amp; portfolio</div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
+      </a>
+
+      <a class="node" style="--plug-color:#e88fc2" href="https://www.instagram.com/lbsync/" target="_blank" rel="noopener">
+        <span class="plug"></span>
+        <div class="node-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#8b929b" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>
+        </div>
+        <div class="node-body">
+          <div class="node-tag">Link · Instagram</div>
+          <div class="node-title">Instagram</div>
+          <div class="node-sub">Compositing, VFX and AI creative process</div>
+        </div>
+        <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
+      </a>
+
+    </div>
+
+  </div>
+
+  <footer>
+    <span>LEVI_MELLO_COMP</span>
+    <span id="stamp">v1.0</span>
+  </footer>
+
+</div>
+
+<script>
+  // subtle build-stamp readout, respects reduced motion
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce){
+    var el = document.getElementById('stamp');
+    var frame = 0;
+    setInterval(function(){
+      frame = (frame + 1) % 1000;
+      el.textContent = 'f' + String(frame).padStart(4,'0');
+    }, 1200);
+  }
+</script>
+
+</body>
+</html>
