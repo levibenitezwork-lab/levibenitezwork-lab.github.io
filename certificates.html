@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Certificates — Levi Mello</title>
+
+<!-- Levi Mello — certificates page. Same design system as index.html. -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg: #0a0c0e;
+    --panel: #14171b;
+    --panel-hover: #191d22;
+    --border: #262b31;
+    --border-hover: #3a4149;
+    --wire: #2c3238;
+    --text: #edeef0;
+    --text-dim: #8b929b;
+    --text-faint: #565d66;
+    --accent: #ff7a3d;
+    --accent-dim: #7a4a30;
+    --teal: #4fd1c5;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ background: var(--bg); }
+
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 64px 20px 40px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before{
+    content:"";
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(var(--border) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.35;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 0%, transparent 75%);
+    pointer-events: none;
+  }
+
+  .page{
+    width: 100%;
+    max-width: 640px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- BACK LINK ---------- */
+
+  .back{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    text-decoration: none;
+    margin-bottom: 28px;
+    transition: color 0.2s ease;
+  }
+  .back:hover{ color: var(--teal); }
+
+  /* ---------- HERO ---------- */
+
+  .hero{
+    margin-bottom: 40px;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .eyebrow .dot{
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 6px var(--teal);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .tagline{
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 16px;
+    letter-spacing: 0.01em;
+    color: var(--teal);
+    margin-top: 10px;
+  }
+
+  .bio{
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin-top: 14px;
+    max-width: 52ch;
+  }
+
+  /* ---------- CERT GRAPH ---------- */
+
+  .graph{
+    position: relative;
+    padding-left: 26px;
+  }
+
+  .graph::before{
+    content:"";
+    position: absolute;
+    left: 3px;
+    top: 6px;
+    bottom: 6px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--wire) 8%, var(--wire) 92%, transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    animation: drawWire 1s cubic-bezier(.4,0,.2,1) forwards;
+    animation-delay: 0.15s;
+  }
+
+  @keyframes drawWire{
+    to{ transform: scaleY(1); }
+  }
+
+  .group{
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .cert{
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 20px 18px;
+    opacity: 0;
+    animation: nodeIn 0.5s ease forwards;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .cert:hover{ border-color: var(--border-hover); }
+
+  @keyframes nodeIn{
+    from{ opacity: 0; transform: translateX(-6px); }
+    to{ opacity: 1; transform: translateX(0); }
+  }
+
+  .cert::before{
+    content:"";
+    position: absolute;
+    left: -26px;
+    top: 30px;
+    width: 20px;
+    height: 1px;
+    background: var(--wire);
+  }
+
+  .plug{
+    position: absolute;
+    left: -30px;
+    top: 30px;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--plug-color, var(--accent));
+    box-shadow: 0 0 6px var(--plug-color, var(--accent));
+  }
+
+  .cert:nth-child(1){ animation-delay: 0.25s; }
+  .cert:nth-child(2){ animation-delay: 0.4s; }
+
+  .cert-tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .cert-title{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--text);
+  }
+
+  .cert-meta{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  .cert-desc{
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .viewer-wrap{
+    margin-top: 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f4f4f4;
+  }
+
+  .viewer-wrap iframe{
+    display: block;
+    width: 100%;
+    height: 460px;
+    border: none;
+  }
+
+  .cert-links{
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+  }
+
+  .cert-links a{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--teal);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cert-links a:hover{ color: var(--text); }
+
+  /* ---------- FOOTER ---------- */
+
+  footer{
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .graph::before, .cert, .eyebrow .dot{ animation: none !important; transform:none !important; opacity:1 !important; }
+  }
+
+  @media (max-width: 480px){
+    h1{ font-size: 28px; }
+    .viewer-wrap iframe{ height: 340px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <a class="back" href="index.html">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"></path></svg>
+    BACK TO HOME
+  </a>
+
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span>CREDENTIALS · 2026</div>
+    <h1>Certificates</h1>
+    <div class="tagline">Formal training behind the frame</div>
+    <p class="bio">Courses completed in Nuke compositing — from industry-level VFX Bureau training to the fundamentals of node-based compositing.</p>
+  </div>
+
+  <div class="graph">
+    <div class="group">
+
+      <div class="cert">
+        <span class="plug" style="--plug-color: var(--accent)"></span>
+        <div class="cert-tag">Course · Hugo's Desk</div>
+        <div class="cert-title">Nuke Compositing Course — Hugo Guerra</div>
+        <div class="cert-meta">150 classes · 50+ hours · Completed September 2026</div>
+        <p class="cert-desc">Industry-level training led by VFX Supervisor Hugo Guerra and Compositing Supervisor Ricardo Ferreira, covering rotoscoping, prep and cleanup, paint, keying, composition and lighting, photography fundamentals for VFX, colour correction, CG compositing, 3D projection, camera tracking and Python scripting for Nuke — built around real production footage and a full junior-to-professional compositing pipeline.</p>
+        <div class="viewer-wrap">
+          <iframe src="certs/hugos-desk-certificate.pdf" title="Hugo's Desk certificate"></iframe>
+        </div>
+        <div class="cert-links">
+          <a href="certs/hugos-desk-certificate.pdf" target="_blank" rel="noopener">
+            OPEN FULL SIZE
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+          </a>
+          <a href="https://hugosdesk.myshopify.com/products/hugo-s-desk-nuke-compositing-online-course" target="_blank" rel="noopener">
+            COURSE PAGE
+          </a>
+        </div>
+      </div>
+
+      <div class="cert">
+        <span class="plug" style="--plug-color: var(--teal)"></span>
+        <div class="cert-tag">Course · Udemy</div>
+        <div class="cert-title">NK101 — Introduction to Nuke VFX Compositing</div>
+        <div class="cert-meta">Alexander Hanneman · 7 hours · Completed July 2026</div>
+        <p class="cert-desc">First course in Compositing Academy's A-Z series, covering the Nuke interface and node graph, the additive colour model, formats and image handling, transforms/reformats/crops, colour correction, rotoscoping and RotoPaint, premultiplication, animation, lens distortion, grain and sensor noise — culminating in a full junior-level greenscreen composite with motion tracking and clean-plating.</p>
+        <div class="viewer-wrap">
+          <iframe src="certs/nk101-certificate.pdf" title="NK101 certificate"></iframe>
+        </div>
+        <div class="cert-links">
+          <a href="certs/nk101-certificate.pdf" target="_blank" rel="noopener">
+            OPEN FULL SIZE
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+          </a>
+          <a href="https://www.udemy.com/course/introduction-to-nuke-compositing-nk101/" target="_blank" rel="noopener">
+            COURSE PAGE
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>LEVI_MELLO_COMP</span>
+    <span>CERTIFICATES</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
