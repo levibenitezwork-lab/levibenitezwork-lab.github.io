@@ -206,6 +206,7 @@
 
   .cert:nth-child(1){ animation-delay: 0.25s; }
   .cert:nth-child(2){ animation-delay: 0.4s; }
+  .cert:nth-child(3){ animation-delay: 0.55s; }
 
   .cert-tag{
     font-family: 'JetBrains Mono', monospace;
@@ -254,6 +255,27 @@
     object-fit: contain;
     border-radius: inherit;
   }
+
+  /* PDF.js renders the actual PDF page as a static, responsive image.
+     No PDF toolbar, cropped page or internal scrolling. */
+  .pdf-preview{ width: 100%; overflow: hidden; border-radius: inherit; }
+  .pdf-preview canvas{
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    background: #fff;
+  }
+  .pdf-preview canvas + canvas{ margin-top: 1px; }
+  .pdf-preview-message{
+    color: #3a4149;
+    background: #fff;
+    padding: 28px 16px;
+    text-align: center;
+    line-height: 1.5;
+    font-size: 13px;
+  }
+  .pdf-preview-message a{ color: #126f76; }
 
   .cert-links{
     display: flex;
@@ -313,6 +335,7 @@
     }
   }
 </style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -327,7 +350,7 @@
     <div class="eyebrow"><span class="dot"></span>CREDENTIALS · 2026</div>
     <h1>Certificates</h1>
     <div class="tagline">Formal training behind the frame</div>
-    <p class="bio">Courses completed in Nuke compositing — from industry-level VFX Bureau training to the fundamentals of node-based compositing.</p>
+    <p class="bio">Formal training in Nuke compositing, professional VFX practices and AI-assisted creation — combining technical fundamentals, advanced workflows and modern tools for audiovisual production.</p>
   </div>
 
   <div class="graph">
@@ -374,6 +397,28 @@
         </div>
       </div>
 
+      <div class="cert">
+        <span class="plug" style="--plug-color: #c9a24a"></span>
+        <div class="cert-tag">Course · Rabbits</div>
+        <div class="cert-title">Projeto Colapso — AI for VFX &amp; Audiovisual Creation</div>
+        <div class="cert-meta">Generative AI · Creative production &amp; post-production</div>
+        <p class="cert-desc">Hands-on training in generative AI for VFX and audiovisual content creation, covering AI-generated images and video, realistic image manipulation, animation and cinematic scene building, creative prompting and scripting with ChatGPT, visual storytelling, AI-assisted editing and shot refinement, character and product placement, and workflow integration using Midjourney, Runway, Pika, Leonardo AI and Photoshop.</p>
+        <div class="viewer-wrap">
+          <div class="pdf-preview" id="colapso-pdf-preview" data-pdf-src="certs/projeto-colapso-certificate.pdf" aria-label="Projeto Colapso certificate — full-page preview">
+            <p class="pdf-preview-message" role="status">Loading certificate preview…</p>
+          </div>
+        </div>
+        <div class="cert-links">
+          <a href="certs/projeto-colapso-certificate.pdf" target="_blank" rel="noopener">
+            OPEN FULL SIZE
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-11a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+          </a>
+          <a href="https://vivendodevideo.com.br/projeto-colapso/" target="_blank" rel="noopener">
+            COURSE PAGE
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -384,5 +429,60 @@
 
 </div>
 
+<script>
+  // Full-page rendering of the Projeto Colapso PDF; scales with the site card.
+  // Upload the certificate to certs/projeto-colapso-certificate.pdf.
+  document.addEventListener('DOMContentLoaded', async function () {
+    const container = document.getElementById('colapso-pdf-preview');
+    if (!container) return;
+    const pdfUrl = container.dataset.pdfSrc;
+    const fallback = function () {
+      container.innerHTML = '';
+      const message = document.createElement('p');
+      message.className = 'pdf-preview-message';
+      message.textContent = 'Certificate preview unavailable. ';
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.target = '_blank';
+      link.rel = 'noopener';
+      link.textContent = 'Open the PDF';
+      message.appendChild(link);
+      container.appendChild(message);
+    };
+
+    if (!window.pdfjsLib) {
+      fallback();
+      return;
+    }
+
+    try {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
+      container.innerHTML = '';
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      const availableWidth = Math.max(container.clientWidth, 1);
+
+      // Normally certificates have one page; render every page if more exist.
+      for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
+        const page = await pdf.getPage(pageIndex);
+        const original = page.getViewport({ scale: 1 });
+        const fitScale = availableWidth / original.width;
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute('aria-label', 'Certificate page ' + pageIndex);
+        const displayViewport = page.getViewport({ scale: fitScale });
+        const renderViewport = page.getViewport({ scale: fitScale * pixelRatio });
+        canvas.width = Math.ceil(renderViewport.width);
+        canvas.height = Math.ceil(renderViewport.height);
+        canvas.style.aspectRatio = displayViewport.width + ' / ' + displayViewport.height;
+        container.appendChild(canvas);
+        const ctx = canvas.getContext('2d', { alpha: false });
+        await page.render({ canvasContext: ctx, viewport: renderViewport, background: 'white' }).promise;
+      }
+    } catch (error) {
+      console.warn('Unable to render Projeto Colapso certificate:', error);
+      fallback();
+    }
+  });
+</script>
 </body>
 </html>
