@@ -134,6 +134,17 @@
     max-width: 52ch;
   }
 
+  .certificate-tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+  .certificate-tab{
+    font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.03em;
+    color:var(--text-dim); background:var(--panel); border:1px solid var(--border);
+    border-radius:8px; padding:12px 16px; min-height:44px; cursor:pointer;
+  }
+  .certificate-tab:hover{ background:var(--panel-hover); border-color:var(--border-hover); }
+  .certificate-tab[aria-selected="true"]{ color:var(--teal); border-color:var(--teal); }
+  .certificate-tab:focus-visible, [role="tabpanel"]:focus-visible{ outline:2px solid var(--teal); outline-offset:4px; }
+  .group[hidden]{ display:none; }
+
   /* ---------- CERT GRAPH ---------- */
 
   .graph{
@@ -353,8 +364,33 @@
     <p class="bio">Formal training in Nuke compositing, professional VFX practices and AI-assisted creation — combining technical fundamentals, advanced workflows and modern tools for audiovisual production.</p>
   </div>
 
+  <div class="certificate-tabs" role="tablist" aria-label="Certificate categories">
+    <button class="certificate-tab" id="nuke-tab" role="tab" aria-selected="true" aria-controls="nuke-panel" type="button">Nuke &amp; Compositing</button>
+    <button class="certificate-tab" id="ai-tab" role="tab" aria-selected="false" aria-controls="ai-panel" tabindex="-1" type="button">AI for VFX</button>
+  </div>
   <div class="graph">
-    <div class="group">
+    <div class="group" id="nuke-panel" role="tabpanel" aria-labelledby="nuke-tab" tabindex="0">
+      <div class="cert">
+        <span class="plug" style="--plug-color: var(--accent)"></span>
+        <div class="cert-tag">Course · Borgo.tv Training</div>
+        <div class="cert-title">Nuke Intermediate — NUK201</div>
+        <div class="cert-meta">Magno Borgo · Borgo.tv Training · 40 hours over 8 weeks</div>
+        <p class="cert-desc">Hands-on training in Nuke 17 focused on solving practical compositing problems, from integrating elements into shots with limited tracking detail to rebuilding skin texture and automating repetitive tasks.</p>
+        <ul class="cert-desc" style="padding-left: 20px;">
+          <li><strong>Screen replacement and shot integration</strong> — Phone and monitor inserts, element placement in defocused footage, and matching defocus, color, and grain to the original plate. Color correction and look matching with MatchGrade.</li>
+          <li><strong>Tracking, stabilization, and lens workflows</strong> — 2D tracking, 3D camera tracking and matchmoving, track refinement, camera stabilization and smoothing, lens distortion correction, and advanced UV and STMap workflows.</li>
+          <li><strong>Digital makeup and image refinement</strong> — RotoPaint for removing unwanted details, skin smoothing and texture reconstruction through denoising and regraining, and SplineWarp for morphing and stabilization. Transform concatenation and filtering to preserve image detail.</li>
+          <li><strong>3D compositing and motion</strong> — Building and editing geometry from tracked shots with ModelBuilder, creating UVs, projecting matte paintings in 3D, and working with 2D and 3D motion blur, SmartVectors, VectorGenerator, and VectorBlur.</li>
+          <li><strong>Expressions and Tcl</strong> — Randomizing and repeating animation, manipulating existing curves, and automating slates and file paths.</li>
+        </ul>
+        <div class="viewer-wrap">
+          <img class="certificate-image" src="certs/magno-borgo-nuke-intermediate-certificate.png" width="3508" height="2480" alt="Borgo.tv Training certificate awarded to Levi Mello Benitez for Nuke Intermediate — NUK201, taught by Magno Borgo; completed 16 November 2026, 40 hours over 8 weeks." decoding="async">
+        </div>
+        <div class="cert-links">
+          <a href="certs/magno-borgo-nuke-intermediate-certificate.png" target="_blank" rel="noopener">OPEN FULL SIZE</a>
+          <a href="https://cursos.borgo.tv/course/index.php?categoryid=1" target="_blank" rel="noopener">COURSE PAGE</a>
+        </div>
+      </div>
 
       <div class="cert">
         <span class="plug" style="--plug-color: var(--accent)"></span>
@@ -397,6 +433,8 @@
         </div>
       </div>
 
+    </div>
+    <div class="group" id="ai-panel" role="tabpanel" aria-labelledby="ai-tab" tabindex="0" hidden>
       <div class="cert">
         <span class="plug" style="--plug-color: #c9a24a"></span>
         <div class="cert-tag">Course · Rabbits</div>
@@ -430,11 +468,58 @@
 </div>
 
 <script>
+  const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+  function selectTab(tab) {
+    tabs.forEach(item => {
+      const selected = item === tab;
+      item.setAttribute('aria-selected', String(selected));
+      item.tabIndex = selected ? 0 : -1;
+      document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
+    });
+    document.dispatchEvent(new Event('certificate-tab-change'));
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectTab(tab));
+    tab.addEventListener('keydown', event => {
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = tabs.length - 1;
+      if (next === undefined) return;
+      event.preventDefault();
+      selectTab(tabs[next]);
+      tabs[next].focus();
+    });
+  });
+  function revealHash() {
+    const target = document.getElementById(location.hash.slice(1));
+    const panel = target && target.closest('[role="tabpanel"]');
+    if (!panel) return;
+    selectTab(document.getElementById(panel.getAttribute('aria-labelledby')));
+    requestAnimationFrame(() => target.scrollIntoView());
+  }
+  window.addEventListener('hashchange', revealHash);
+  revealHash();
+
   // Full-page rendering of the Projeto Colapso PDF; scales with the site card.
   // Upload the certificate to certs/projeto-colapso-certificate.pdf.
   document.addEventListener('DOMContentLoaded', async function () {
     const container = document.getElementById('colapso-pdf-preview');
     if (!container) return;
+    // Wait until the panel has a real layout width, including on the first visit.
+    if (!container.clientWidth) {
+      await new Promise(resolve => {
+        const onVisible = () => {
+          if (!container.clientWidth) return;
+          document.removeEventListener('certificate-tab-change', onVisible);
+          resolve();
+        };
+        document.addEventListener('certificate-tab-change', onVisible);
+        onVisible();
+      });
+    }
+    const availableWidth = container.clientWidth;
     const pdfUrl = container.dataset.pdfSrc;
     const fallback = function () {
       container.innerHTML = '';
@@ -460,7 +545,7 @@
       const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
       container.innerHTML = '';
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-      const availableWidth = Math.max(container.clientWidth, 1);
+
 
       // Normally certificates have one page; render every page if more exist.
       for (let pageIndex = 1; pageIndex <= pdf.numPages; pageIndex++) {
