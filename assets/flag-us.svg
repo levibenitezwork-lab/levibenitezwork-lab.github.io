@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 260" preserveAspectRatio="none">
+  <path fill="#fff" d="M0 0h390v260H0z"/>
+  <path stroke="#B31942" stroke-width="20" d="M0 10h390M0 50h390M0 90h390M0 130h390M0 170h390M0 210h390M0 250h390"/>
+  <path fill="#0A3161" d="M0 0h156v140H0z"/>
+  <defs>
+    <pattern id="stars" y="9" width="26" height="28" patternUnits="userSpaceOnUse">
+      <path fill="#fff" d="m13 2 1.2 3.5H18l-3 2.2 1.1 3.6L13 9.1l-3.1 2.2L11 7.7 8 5.5h3.8z"/>
+    </pattern>
+    <pattern id="offset-stars" href="#stars" x="13" y="23"/>
+  </defs>
+  <path fill="url(#stars)" d="M0 9h156v126H0z"/>
+  <path fill="url(#offset-stars)" d="M13 23h130v112H13z"/>
+</svg>

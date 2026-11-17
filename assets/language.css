@@ -1,0 +1,40 @@
+.language-switch {
+  position: absolute;
+  top: -46px;
+  right: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.language-switch a {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+.language-switch a[aria-current="page"] {
+  border-color: var(--border-hover);
+}
+
+.language-switch a:hover {
+  background: var(--panel);
+}
+
+.language-switch a:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 1px;
+}
+
+.language-switch img {
+  display: block;
+  border-radius: 2px;
+}
+
+@media (max-width: 600px) {
+  .page:has(.back) .language-switch {
+    top: -14px;
+  }
+}

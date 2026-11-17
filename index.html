@@ -1,9 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Levi Mello — Compositing Portfolio</title>
+<title>Levi Mello — Portfólio de Composição</title>
+<meta name="description" content="Keying, rotoscopia, cleanup e integração de CG no Nuke, combinados com fluxos de trabalho com IA para arte conceitual, pré-visualização e sequências generativas.">
+<link rel="canonical" href="https://levibenitezwork-lab.github.io/">
+<link rel="alternate" hreflang="pt-BR" href="https://levibenitezwork-lab.github.io/">
+<link rel="alternate" hreflang="en-US" href="https://levibenitezwork-lab.github.io/en/">
+<link rel="alternate" hreflang="x-default" href="https://levibenitezwork-lab.github.io/">
 
 <!-- Levi Mello — links page. Vimeo and Instagram links are already filled in. -->
 
@@ -11,327 +16,26 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<style>
-  :root{
-    --bg: #0a0c0e;
-    --panel: #14171b;
-    --panel-hover: #191d22;
-    --border: #262b31;
-    --border-hover: #3a4149;
-    --wire: #2c3238;
-    --text: #edeef0;
-    --text-dim: #8b929b;
-    --text-faint: #565d66;
-    --accent: #ff7a3d;
-    --accent-dim: #7a4a30;
-    --teal: #4fd1c5;
-  }
-
-  *{ box-sizing: border-box; margin:0; padding:0; }
-
-  html{ background: var(--bg); }
-
-  body{
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    padding: 64px 20px 40px;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* faint node-graph dot grid backdrop */
-  body::before{
-    content:"";
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(var(--border) 1px, transparent 1px);
-    background-size: 28px 28px;
-    opacity: 0.35;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 20%, black 0%, transparent 75%);
-    pointer-events: none;
-  }
-
-  .page{
-    width: 100%;
-    max-width: 460px;
-    position: relative;
-    z-index: 1;
-  }
-
-  /* ---------- HERO ---------- */
-
-  .hero{
-    margin-bottom: 56px;
-  }
-
-  .eyebrow{
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: var(--text-faint);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 22px;
-  }
-
-  .eyebrow .dot{
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--teal);
-    box-shadow: 0 0 6px var(--teal);
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes pulse{
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.35; }
-  }
-
-  h1{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    font-size: 42px;
-    line-height: 1.05;
-    letter-spacing: -0.01em;
-    color: var(--text);
-  }
-
-  .tagline{
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 500;
-    font-size: 17px;
-    letter-spacing: 0.01em;
-    color: var(--teal);
-    margin-top: 10px;
-  }
-
-  .role{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 500;
-    font-size: 16px;
-    color: var(--accent);
-    margin-top: 10px;
-  }
-
-  .bio{
-    font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--text-dim);
-    margin-top: 16px;
-    max-width: 40ch;
-  }
-
-  .status{
-    display: inline-flex;
-    align-items: flex-start;
-    gap: 8px;
-    margin-top: 20px;
-    max-width: 100%;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    line-height: 1.5;
-    color: var(--text-dim);
-    border: 1px solid var(--border);
-    padding: 9px 14px;
-    border-radius: 8px;
-  }
-  .status .dot{
-    flex-shrink: 0;
-    width: 6px; height: 6px;
-    margin-top: 4px;
-    border-radius: 50%;
-    background: var(--teal);
-    box-shadow: 0 0 6px var(--teal);
-  }
-
-  /* ---------- NODE GRAPH ---------- */
-
-  .graph{
-    position: relative;
-    padding-left: 26px;
-  }
-
-  .graph::before{
-    content:"";
-    position: absolute;
-    left: 3px;
-    top: 6px;
-    bottom: 6px;
-    width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--wire) 8%, var(--wire) 92%, transparent);
-    transform: scaleY(0);
-    transform-origin: top;
-    animation: drawWire 1s cubic-bezier(.4,0,.2,1) forwards;
-    animation-delay: 0.15s;
-  }
-
-  @keyframes drawWire{
-    to{ transform: scaleY(1); }
-  }
-
-  .group{
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .node{
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 16px;
-    text-decoration: none;
-    color: var(--text);
-    opacity: 0;
-    animation: nodeIn 0.5s ease forwards;
-    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
-  }
-
-  .node:hover, .node:focus-visible{
-    border-color: var(--border-hover);
-    background: var(--panel-hover);
-    transform: translateX(3px);
-    outline: none;
-  }
-
-  .node.primary{
-    padding: 20px 18px;
-    border-color: var(--accent-dim);
-    background: linear-gradient(180deg, #1a1712, var(--panel));
-  }
-  .node.primary:hover, .node.primary:focus-visible{
-    border-color: var(--accent);
-  }
-
-  @keyframes nodeIn{
-    from{ opacity: 0; transform: translateX(-6px); }
-    to{ opacity: 1; transform: translateX(0); }
-  }
-
-  /* stub connecting spine to node + plug dot */
-  .node::before{
-    content:"";
-    position: absolute;
-    left: -26px;
-    top: 50%;
-    width: 20px;
-    height: 1px;
-    background: var(--wire);
-  }
-
-  .plug{
-    position: absolute;
-    left: -30px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 1.5px solid var(--wire);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .node:hover .plug, .node:focus-visible .plug{
-    border-color: var(--plug-color, var(--accent));
-    box-shadow: 0 0 8px var(--plug-color, var(--accent));
-  }
-  .node.primary .plug{ border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
-
-  .node-icon{
-    flex-shrink: 0;
-    width: 38px; height: 38px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .node-icon svg{ width: 18px; height: 18px; }
-
-  .node-body{ flex: 1; min-width: 0; }
-
-  .node-tag{
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.06em;
-    color: var(--text-faint);
-    text-transform: uppercase;
-    margin-bottom: 3px;
-  }
-  .node.primary .node-tag{ color: var(--accent); }
-
-  .node-title{
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 16px;
-    color: var(--text);
-  }
-  .node-sub{
-    font-size: 12.5px;
-    color: var(--text-dim);
-    margin-top: 2px;
-  }
-
-  .chevron{
-    flex-shrink: 0;
-    color: var(--text-faint);
-    transition: transform 0.2s ease, color 0.2s ease;
-  }
-  .node:hover .chevron, .node:focus-visible .chevron{
-    transform: translateX(2px);
-    color: var(--text-dim);
-  }
-
-  /* stagger node entrance */
-  .node:nth-child(1){ animation-delay: 0.35s; }
-  .node:nth-child(2){ animation-delay: 0.48s; }
-  .node:nth-child(3){ animation-delay: 0.61s; }
-  .node:nth-child(4){ animation-delay: 0.74s; }
-
-  /* ---------- FOOTER ---------- */
-
-  footer{
-    margin-top: 48px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    color: var(--text-faint);
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .graph::before, .node, .eyebrow .dot{ animation: none !important; transform:none !important; opacity:1 !important; }
-  }
-
-  @media (max-width: 400px){
-    h1{ font-size: 34px; }
-  }
-</style>
+<link rel="stylesheet" href="/assets/home.css">
+<link rel="stylesheet" href="/assets/language.css">
+<script defer src="/assets/home.js"></script>
 </head>
 <body>
 
 <div class="page">
 
+  <nav class="language-switch" aria-label="Idioma">
+    <a href="/" hreflang="pt-BR" lang="pt-BR" aria-label="Português (Brasil)" aria-current="page"><img src="/assets/flag-br.svg" width="24" height="16" alt=""></a>
+    <a href="/en/" hreflang="en-US" lang="en-US" aria-label="English (US)"><img src="/assets/flag-us.svg" width="24" height="16" alt=""></a>
+  </nav>
+
   <div class="hero">
-    <div class="eyebrow"><span class="dot"></span>COMPOSITING PORTFOLIO · 2026</div>
+    <div class="eyebrow"><span class="dot"></span>PORTFÓLIO DE COMPOSIÇÃO · 2026</div>
     <h1>Levi Mello</h1>
-    <div class="tagline">The last artist to touch the frame</div>
-    <div class="role">Junior Nuke Compositor · AI &amp; VFX Artist</div>
-    <p class="bio">Keying, rotoscoping, cleanup and CG integration in Nuke — paired with AI-driven workflows for concept, previs and generative sequences.</p>
-    <div class="status"><span class="dot"></span>OPEN TO JUNIOR ROLES, FREELANCE &amp; REMOTE WORK · SÃO PAULO, BRAZIL</div>
+    <div class="tagline">O último artista a tocar o quadro</div>
+    <div class="role">Compositor de VFX Júnior | Nuke · Artista de IA e VFX</div>
+    <p class="bio">Keying, rotoscopia, cleanup e integração de CG no Nuke, combinados com fluxos de trabalho com IA para arte conceitual, pré-visualização e sequências generativas.</p>
+    <div class="status"><span class="dot"></span>DISPONÍVEL PARA VAGAS JÚNIOR, FREELANCE E TRABALHO REMOTO · SÃO PAULO, BRASIL</div>
   </div>
 
   <div class="graph">
@@ -344,9 +48,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#ff7a3d" stroke-width="1.6"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
         </div>
         <div class="node-body">
-          <div class="node-tag">Output · Vimeo</div>
-          <div class="node-title">Watch my reel</div>
-          <div class="node-sub">Compositing showreel, breakdowns &amp; portfolio</div>
+          <div class="node-tag">Saída · Vimeo</div>
+          <div class="node-title">Assista ao meu reel</div>
+          <div class="node-sub">Reel de composição, breakdowns e portfólio</div>
         </div>
         <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
       </a>
@@ -359,7 +63,7 @@
         <div class="node-body">
           <div class="node-tag">Link · Instagram</div>
           <div class="node-title">Instagram</div>
-          <div class="node-sub">Compositing, VFX and AI creative process</div>
+          <div class="node-sub">Processo criativo em composição, VFX e IA</div>
         </div>
         <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
       </a>
@@ -370,9 +74,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#4fd1c5" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg>
         </div>
         <div class="node-body">
-          <div class="node-tag">Write · Contact</div>
-          <div class="node-title">Get in touch</div>
-          <div class="node-sub">Available for freelance and remote work</div>
+          <div class="node-tag">Mensagem · Contato</div>
+          <div class="node-title">Entre em contato</div>
+          <div class="node-sub">Disponível para freelance e trabalho remoto</div>
         </div>
         <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
       </a>
@@ -383,9 +87,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#c9a24a" stroke-width="1.6"><path d="M12 15a5 5 0 100-10 5 5 0 000 10z"></path><path d="M8.5 13.5L7 22l5-3 5 3-1.5-8.5"></path></svg>
         </div>
         <div class="node-body">
-          <div class="node-tag">Credential · Certificates</div>
-          <div class="node-title">Certificates</div>
-          <div class="node-sub">Certificates in Nuke, VFX and AI workflows</div>
+          <div class="node-tag">Credencial · Certificados</div>
+          <div class="node-title">Certificados</div>
+          <div class="node-sub">Certificados em Nuke, VFX e fluxos de trabalho com IA</div>
         </div>
         <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
       </a>
@@ -396,9 +100,9 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="#4f8fc9" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M8 10v7M8 7v.2M12 17v-7m0 3a3 3 0 016 0v4"></path></svg>
         </div>
         <div class="node-body">
-          <div class="node-tag">Network · LinkedIn</div>
-          <div class="node-title">LinkedIn Profile</div>
-          <div class="node-sub">Professional background, skills &amp; connections</div>
+          <div class="node-tag">Rede · LinkedIn</div>
+          <div class="node-title">Perfil no LinkedIn</div>
+          <div class="node-sub">Trajetória profissional, competências e conexões</div>
         </div>
         <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
       </a>
@@ -414,18 +118,7 @@
 
 </div>
 
-<script>
-  // subtle build-stamp readout, respects reduced motion
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!reduce){
-    var el = document.getElementById('stamp');
-    var frame = 0;
-    setInterval(function(){
-      frame = (frame + 1) % 1000;
-      el.textContent = 'f' + String(frame).padStart(4,'0');
-    }, 1200);
-  }
-</script>
+
 
 </body>
 </html>
